@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>StyleAI — Login / Register</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+      --night: #0f0d0b;
+      --surface: #1a1814;
+      --border: rgba(255,255,255,0.08);
+      --cream: #f0e6d3;
+      --gold: #c9a96e;
+      --gold-light: #e5c88a;
+      --text-muted: rgba(240,230,211,0.55);
+      --success: #4ade80;
+      --error: #f87171;
+      --font-serif: 'Playfair Display', serif;
+      --font-sans: 'DM Sans', sans-serif;
+      --transition: all 0.25s ease;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--night);
+      color: var(--cream);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── Animated gradient background ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 30%, rgba(201,169,110,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 80% at 80% 70%, rgba(96,165,250,0.05) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Floating orbs ── */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.25;
+      pointer-events: none;
+      animation: floatOrb 8s ease-in-out infinite alternate;
+    }
+    .orb-1 { width: 500px; height: 500px; background: var(--gold); top: -150px; left: -100px; animation-duration: 9s; }
+    .orb-2 { width: 400px; height: 400px; background: #60a5fa; bottom: -100px; right: -100px; animation-duration: 11s; animation-delay: -4s; }
+
+    @keyframes floatOrb {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(40px, 20px) scale(1.05); }
+    }
+
+    /* ── Auth card ── */
+    .auth-wrapper {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 460px;
+      padding: 20px;
+    }
+
+    .auth-brand {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .auth-brand .brand-icon { color: var(--gold); margin-right: 4px; font-size: 1.4rem; }
+    .auth-brand h1 { font-family: var(--font-serif); font-size: 2.2rem; letter-spacing: 1px; }
+    .auth-brand h1 em { color: var(--gold); font-style: normal; }
+    .auth-brand p { color: var(--text-muted); font-size: 0.88rem; margin-top: 6px; }
+
+    .auth-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+    }
+
+    /* ── Tabs ── */
+    .auth-tabs {
+      display: flex;
+      background: rgba(255,255,255,0.04);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 32px;
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 9px;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .auth-tab.active {
+      background: var(--gold);
+      color: var(--night);
+    }
+
+    /* ── Forms ── */
+    .auth-form { display: none; }
+    .auth-form.active { display: block; animation: fadeSlide 0.3s ease; }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-wrap i {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .input-wrap input {
+      width: 100%;
+      padding: 13px 16px 13px 44px;
+      background: rgba(0,0,0,0.25);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--cream);
+      font-family: var(--font-sans);
+      font-size: 0.95rem;
+      transition: var(--transition);
+    }
+
+    .input-wrap input:focus {
+      outline: none;
+      border-color: var(--gold);
+      background: rgba(201,169,110,0.05);
+      box-shadow: 0 0 0 3px rgba(201,169,110,0.1);
+    }
+
+    .input-wrap input::placeholder { color: rgba(240,230,211,0.25); }
+
+    /* Password visibility toggle */
+    .toggle-pass {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+    .toggle-pass:hover { color: var(--gold); }
+
+    /* ── Submit button ── */
+    .btn-auth {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      border: none;
+      border-radius: 12px;
+      color: var(--night);
+      font-family: var(--font-sans);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      letter-spacing: 0.02em;
+    }
+
+    .btn-auth:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(201,169,110,0.35);
+    }
+
+    .btn-auth:active { transform: translateY(0); }
+
+    /* ── Alert messages ── */
+    .auth-alert {
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .auth-alert.error {
+      background: rgba(248,113,113,0.1);
+      border: 1px solid rgba(248,113,113,0.3);
+      color: var(--error);
+    }
+
+    .auth-alert.success {
+      background: rgba(74,222,128,0.1);
+      border: 1px solid rgba(74,222,128,0.3);
+      color: var(--success);
+    }
+
+    /* ── Divider ── */
+    .form-footer {
+      text-align: center;
+      margin-top: 22px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .form-footer a {
+      color: var(--gold);
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .form-footer a:hover { text-decoration: underline; }
+
+    /* ── Terms checkbox ── */
+    .terms-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .terms-row input[type="checkbox"] {
+      accent-color: var(--gold);
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .terms-row label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* ── Strength bar ── */
+    .strength-bar {
+      height: 3px;
+      border-radius: 3px;
+      background: rgba(255,255,255,0.07);
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .strength-fill {
+      height: 100%;
+      width: 0;
+      border-radius: 3px;
+      transition: width 0.4s ease, background 0.4s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div class="auth-wrapper">
+    <!-- Brand Header -->
+    <div class="auth-brand">
+      <h1><span class="brand-icon">✦</span> Style<em>AI</em></h1>
+      <p>Your Personal AI Fashion Stylist</p>
+    </div>
+
+    <!-- Card -->
+    <div class="auth-card">
+      <!-- Flash messages from Flask -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="auth-alert {{ 'error' if category == 'error' else 'success' }}">
+              <i class="fas {{ 'fa-circle-xmark' if category == 'error' else 'fa-circle-check' }}"></i>
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <!-- Tabs -->
+      <div class="auth-tabs" role="tablist">
+        <button class="auth-tab {{ 'active' if active_tab == 'login' else '' }}" id="loginTabBtn" onclick="switchAuthTab('login')">
+          <i class="fas fa-sign-in-alt"></i> Sign In
+        </button>
+        <button class="auth-tab {{ 'active' if active_tab == 'register' else '' }}" id="registerTabBtn" onclick="switchAuthTab('register')">
+          <i class="fas fa-user-plus"></i> Register
+        </button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <form class="auth-form {{ 'active' if active_tab == 'login' else '' }}" id="loginForm" method="POST" action="/auth/login">
+        <div class="form-group">
+          <label for="loginEmail">Email Address</label>
+          <div class="input-wrap">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="loginEmail" name="email" placeholder="you@example.com" required autocomplete="email"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <div class="input-wrap">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="loginPassword" name="password" placeholder="Enter your password" required autocomplete="current-password"/>
+            <button type="button" class="toggle-pass" onclick="togglePasswordVisibility('loginPassword', this)">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="btn-auth">
+          <i class="fas fa-arrow-right-to-bracket"></i> Sign In to StyleAI
+        </button>
+        <p class="form-footer">
+          Don't have an account? <a onclick="switchAuthTab('register')">Create one →</a>
+        </p>
+      </form>
+
+      <!-- REGISTER FORM -->
+      <form class="auth-form {{ 'active' if active_tab == 'register' else '' }}" id="registerForm" method="POST" action="/auth/register">
+        <div class="form-group">
+          <label for="regName">Full Name</label>
+          <div class="input-wrap">
+            <i class="fas fa-user"></i>
+            <input type="text" id="regName" name="name" placeholder="Your full name" required autocomplete="name"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="regEmail">Email Address</label>
+          <div class="input-wrap">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="regEmail" name="email" placeholder="you@example.com" required autocomplete="email"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="regPassword">Password</label>
+          <div class="input-wrap">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="regPassword" name="password" placeholder="Min. 8 characters" required
+              autocomplete="new-password" oninput="checkStrength(this.value)"/>
+            <button type="button" class="toggle-pass" onclick="togglePasswordVisibility('regPassword', this)">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+          <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+        </div>
+        <div class="terms-row">
+          <input type="checkbox" id="terms" name="terms" required/>
+          <label for="terms">I agree to the <a href="#" style="color:var(--gold)">Terms of Service</a> and understand StyleAI will use AI to analyse my style.</label>
+        </div>
+        <button type="submit" class="btn-auth">
+          <i class="fas fa-sparkles"></i> Create My Style Profile
+        </button>
+        <p class="form-footer">
+          Already have an account? <a onclick="switchAuthTab('login')">Sign in →</a>
+        </p>
+      </form>
+    </div><!-- /auth-card -->
+  </div>
+
+  <script>
+    // which tab is active on page load
+    let _activeTab = '{{ active_tab }}';
+
+    function switchAuthTab(tab) {
+      _activeTab = tab;
+      document.querySelectorAll('.auth-tab').forEach(b =>
+        b.classList.toggle('active', b.id === tab + 'TabBtn')
+      );
+      document.querySelectorAll('.auth-form').forEach(f =>
+        f.classList.toggle('active', f.id === tab + 'Form')
+      );
+    }
+
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      const icon  = btn.querySelector('i');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fas fa-eye-slash';
+      } else {
+        input.type = 'password';
+        icon.className = 'fas fa-eye';
+      }
+    }
+
+    function checkStrength(val) {
+      const fill = document.getElementById('strengthFill');
+      let score = 0;
+      if (val.length >= 8)             score++;
+      if (/[A-Z]/.test(val))           score++;
+      if (/[0-9]/.test(val))           score++;
+      if (/[^A-Za-z0-9]/.test(val))   score++;
+      const pct  = (score / 4) * 100;
+      const clrs = ['#f87171','#fb923c','#facc15','#4ade80'];
+      fill.style.width      = pct + '%';
+      fill.style.background = clrs[score - 1] || 'transparent';
+    }
+  </script>
+</body>
+</html>

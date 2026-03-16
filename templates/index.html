@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Style AI — Your Personal Fashion Stylist</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='animations.css') }}" />
+
+</head>
+
+<body>
+  <!-- Particles Canvas Container -->
+  <div id="tsparticles"
+    style="position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; pointer-events: none;"></div>
+
+
+  <!-- ═══ NAVBAR ═══ -->
+  <!-- Gender class applied to body via JS for dynamic coloring -->
+  <nav class="navbar" id="mainNav">
+    <div class="nav-inner">
+      <a class="nav-brand" onclick="navigateTo('home')" href="#">
+        <span class="brand-icon">✦</span> Style<em>AI</em>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a onclick="navigateTo('home')" href="#" data-page="home">Home</a></li>
+        <li><a onclick="navigateTo('analyzer')" href="#" data-page="analyzer">Try It</a></li>
+        <li><a onclick="navigateTo('results')" href="#" data-page="results">Results</a></li>
+        <li><a onclick="navigateTo('about')" href="#" data-page="about">How It Works</a></li>
+      </ul>
+      <div class="nav-right">
+        <!-- Weather Widget -->
+        <div class="weather-widget" id="weatherWidget" title="Current weather in your city">
+          <span class="weather-emoji" id="weatherEmoji">🌤️</span>
+          <span class="weather-temp" id="weatherTemp">--°C</span>
+          <span class="weather-city" id="weatherCity">{{user.city if user and user.city else '---'}}</span>
+        </div>
+        <!-- AI Status -->
+        <div class="nav-status" id="navStatus">
+          <span class="status-dot"></span> AI Ready
+        </div>
+        <!-- User section -->
+        {% if user %}
+        <div class="nav-user" id="navUserBlock">
+          <div class="nav-avatar" id="navAvatarEl">
+            {% if user.profile_photo %}
+            <img src="{{ user.profile_photo }}" alt="{{ user.name }}"/>
+            {% else %}
+            {{ user.name[0].upper() }}
+            {% endif %}
+          </div>
+          <span class="nav-username">{{ user.name.split()[0] }}</span>
+          <a href="/profile/setup" class="nav-btn-icon" title="Edit Profile">
+            <i class="fas fa-user-cog"></i>
+          </a>
+          <a href="/auth/logout" class="nav-logout" title="Sign out">
+            <i class="fas fa-sign-out-alt"></i>
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <!-- gender for JS coloring -->
+  <script>
+    window.USER_GENDER = '{{ user.gender if user else "male" }}';
+    window.USER_CITY   = '{{ user.city if user and user.city else "" }}';
+    window.USER_BUDGET_MIN = {{ user.budget_min if user else 500 }};
+    window.USER_BUDGET_MAX = {{ user.budget_max if user else 5000 }};
+    window.USER_BRANDS = '{{ user.preferred_brands if user and user.preferred_brands else "" }}';
+    window.USER_HEIGHT = '{{ user.height if user and user.height else "" }}';
+  </script>
+
+  <!-- ══════════════════════════════════════
+     PAGE 1: HOME
+══════════════════════════════════════ -->
+  <div class="page active" id="page-home">
+    <section class="hero">
+      <div class="hero-content">
+        <div class="hero-badge">✦ AI-Powered Fashion Advisor</div>
+        <h1 class="hero-title">Your Personal<br /><em>Fashion Stylist</em><br />Powered by AI</h1>
+        <p class="hero-subtitle">
+          Detect your skin tone via live camera or photo upload.
+          Get AI-curated outfit recommendations, colour palettes &amp; direct shopping links — personalised to your
+          complexion.
+        </p>
+        <div class="hero-cta">
+          <a href="/auth/login" class="btn-primary">
+            <i class="fas fa-user"></i> Login / Register
+          </a>
+          <a onclick="navigateTo('about')" href="#" class="btn-ghost">How It Works</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat"><span>4</span>
+            <p>Skin Tone Types</p>
+          </div>
+          <div class="stat"><span>7+</span>
+            <p>Premium Stores</p>
+          </div>
+          <div class="stat"><span>100%</span>
+            <p>Personalised</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visual side — CSS only, no random images -->
+      <div class="hero-visual">
+        <div class="hero-cards">
+          <div class="hero-card hc-1">
+            <div class="hc-swatch" style="background:#f5cba7"></div>
+            <div class="hc-info">
+              <span class="hc-tone">Fair Skin</span>
+              <span class="hc-tag">Outfits ready ✓</span>
+            </div>
+          </div>
+          <div class="hero-card hc-2">
+            <div class="hc-swatch" style="background:#c8843c"></div>
+            <div class="hc-info">
+              <span class="hc-tone">Medium Skin</span>
+              <span class="hc-tag">Outfits ready ✓</span>
+            </div>
+          </div>
+          <div class="hero-card hc-3">
+            <div class="hc-swatch" style="background:#8b5e3c"></div>
+            <div class="hc-info">
+              <span class="hc-tone">Olive Skin</span>
+              <span class="hc-tag">Outfits ready ✓</span>
+            </div>
+          </div>
+          <div class="hero-card hc-4">
+            <div class="hc-swatch" style="background:#4a2c1a"></div>
+            <div class="hc-info">
+              <span class="hc-tone">Deep Skin</span>
+              <span class="hc-tag">Outfits ready ✓</span>
+            </div>
+          </div>
+        </div>
+        <div class="hero-pipeline">
+          <div class="hp-step"><i class="fas fa-camera"></i><span>Detect</span></div>
+          <div class="hp-arrow">→</div>
+          <div class="hp-step"><i class="fas fa-brain"></i><span>Analyse</span></div>
+          <div class="hp-arrow">→</div>
+          <div class="hp-step"><i class="fas fa-tshirt"></i><span>Style</span></div>
+          <div class="hp-arrow">→</div>
+          <div class="hp-step"><i class="fas fa-shopping-bag"></i><span>Shop</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features">
+      <div class="container">
+        <div class="section-label">Why Style AI?</div>
+        <h2 class="section-title">Everything You Need to Look Your Best</h2>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-video"></i></div>
+            <h3>Live Camera Detection</h3>
+            <p>Real-time skin tone badge updates on your webcam feed before you even capture.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-camera"></i></div>
+            <h3>Photo Upload</h3>
+            <p>Upload any photo — YOLO + DINOv2 detects your exact skin tone instantly.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-venus-mars"></i></div>
+            <h3>Gender Validation</h3>
+            <p>DeepFace AI verifies your photo matches the selected gender before recommending.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-palette"></i></div>
+            <h3>Colour Matching</h3>
+            <p>Primary, secondary and accent palette matched precisely to your complexion.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-tshirt"></i></div>
+            <h3>Outfit Previews</h3>
+            <p>See fashion images for each recommended outfit piece — no guesswork.</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-shopping-bag"></i></div>
+            <h3>Multi-Store Shopping</h3>
+            <p>Direct links to Amazon.in, Myntra, Zara, Flipkart, Puma, Adidas &amp; Armani Exchange.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <div class="footer-brand"><span class="brand-icon">✦</span> Style<em>AI</em></div>
+        <p>© 2024 StyleAI · Powered by Groq LLaMA 3.3 70B · YOLO · DINOv2 · DeepFace</p>
+        <div class="footer-stores">
+          <span>Amazon.in</span><span>Myntra</span><span>Zara</span>
+          <span>Flipkart</span><span>Puma</span><span>Adidas</span><span>Armani Exchange</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ══════════════════════════════════════
+     PAGE 2: ANALYZER
+══════════════════════════════════════ -->
+  <div class="page" id="page-analyzer">
+    <section class="analyzer-section">
+      <div class="container">
+        <div class="section-label">Begin Analysis</div>
+        <h2 class="section-title">Analyse Your Style</h2>
+
+        <div class="upload-wrapper">
+          <!-- Left — Form -->
+          <div class="upload-form-col">
+
+            <!-- Gender -->
+            <div class="gender-selector">
+              <p class="selector-label"><i class="fas fa-venus-mars"></i> Step 1 — Select your gender:</p>
+              <div class="gender-buttons">
+                <button class="gender-btn active" data-gender="male" onclick="setGender('male',this)">
+                  <i class="fas fa-mars"></i> Male
+                </button>
+                <button class="gender-btn" data-gender="female" onclick="setGender('female',this)">
+                  <i class="fas fa-venus"></i> Female
+                </button>
+              </div>
+              <p class="gender-note">
+                <i class="fas fa-info-circle"></i>
+                AI will verify that your uploaded photo matches this selection.
+              </p>
+            </div>
+
+            <!-- Weather + Occasion Context -->
+            <div class="weather-context-card" id="weatherContextCard">
+              <div class="wc-header">
+                <div class="wc-weather-info">
+                  <span class="wc-emoji" id="wcEmoji">🌤️</span>
+                  <div>
+                    <div class="wc-temp" id="wcTemp">Fetching weather…</div>
+                    <div class="wc-loc" id="wcLoc">{{user.city if user and user.city else 'Set city in profile'}}</div>
+                  </div>
+                </div>
+                <div class="wc-budget-info" id="wcBudgetBadge">
+                  ₹<span id="wcBudgetMin">{{user.budget_min if user else 500}}</span> –
+                  ₹<span id="wcBudgetMax">{{user.budget_max if user else 5000}}</span>
+                </div>
+              </div>
+              <div class="wc-occasion">
+                <p class="wc-label">What's the occasion?</p>
+                <div class="occasion-chips" id="occasionChips">
+                  <button type="button" class="occ-chip active" data-occ="casual">👕 Casual</button>
+                  <button type="button" class="occ-chip" data-occ="work">💼 Work</button>
+                  <button type="button" class="occ-chip" data-occ="party">🎉 Party</button>
+                  <button type="button" class="occ-chip" data-occ="date">💑 Date Night</button>
+                  <button type="button" class="occ-chip" data-occ="wedding">💍 Wedding</button>
+                  <button type="button" class="occ-chip" data-occ="outdoor">🌿 Outdoor</button>
+                  <button type="button" class="occ-chip" data-occ="gym">🏋️ Gym</button>
+                  <button type="button" class="occ-chip" data-occ="formal">🎩 Formal</button>
+                </div>
+              </div>
+              {% if user and user.preferred_brands %}
+              <div class="wc-brands-row">
+                <i class="fas fa-tags"></i>
+                <span>Preferred: <strong>{{user.preferred_brands}}</strong></span>
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Hidden inputs appended to formData in JS -->
+            <input type="hidden" id="prefHeight" value="{{ user.height if user and user.height else '' }}"/>
+            <input type="hidden" id="prefBrands" value="{{ user.preferred_brands if user and user.preferred_brands else '' }}"/>
+            <input type="hidden" id="prefBudget" value="{{ user.budget_min if user else 500 }}-{{ user.budget_max if user else 5000 }}"/>
+            <input type="hidden" id="prefOccasion" value="casual"/>
+            <input type="hidden" id="prefWeather" value=""/>
+
+
+            <!-- Mode Tabs -->
+            <div class="mode-tabs">
+              <button class="tab-btn active" data-tab="upload" onclick="switchTab('upload')">
+                <i class="fas fa-upload"></i> Upload Photo
+              </button>
+              <button class="tab-btn" data-tab="camera" onclick="switchTab('camera')">
+                <i class="fas fa-video"></i> Live Camera
+              </button>
+              <button class="tab-btn" data-tab="avatar" onclick="switchTab('avatar')">
+                <i class="fas fa-user-astronaut"></i> Avatar Builder
+              </button>
+            </div>
+
+            <!-- Upload Panel -->
+            <div id="uploadPanel">
+              <div class="drop-zone" id="dropZone">
+                <div class="dz-inner" id="dzInner">
+                  <div class="dz-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                  <h3>Drag &amp; Drop Your Photo</h3>
+                  <p>or</p>
+                  <label class="btn-browse" for="fileInput">
+                    <i class="fas fa-folder-open"></i> Browse Files
+                  </label>
+                  <input type="file" id="fileInput" accept="image/*" style="display:none" />
+                  <p class="dz-hint">PNG, JPG, JPEG, GIF, WEBP · Max 10MB</p>
+                </div>
+                <div class="dz-preview" id="dzPreview" style="display:none">
+                  <img id="previewImg" src="" alt="Preview" />
+                  <div class="dz-overlay">
+                    <div class="analyzing-ring"></div>
+                    <p id="analyzeStatus">Ready to analyze!</p>
+                  </div>
+                  <button class="dz-remove" onclick="resetUpload()"><i class="fas fa-times"></i></button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Camera Panel -->
+            <div id="cameraPanel" style="display:none">
+              <div class="camera-container">
+                <video id="cameraFeed" autoplay playsinline muted></video>
+                <div id="liveToneBadge" class="live-tone-badge" style="display:none">
+                  <span class="live-dot"></span>
+                  <span id="liveToneText">Detecting…</span>
+                </div>
+                <canvas id="cameraCanvas" style="display:none"></canvas>
+              </div>
+              <p id="cameraStatus" class="camera-status-text">
+                <i class="fas fa-circle-notch fa-spin"></i> Starting camera…
+              </p>
+            </div>
+
+            <!-- Avatar Builder Panel -->
+            <div id="avatarPanel" style="display:none">
+              <div class="avatar-builder-container">
+                <h3 style="color:var(--cream);font-family:var(--font-serif);margin-bottom:12px;text-align:center;">
+                  Select Avatar Skin Tone</h3>
+                <p style="color:var(--text-muted);font-size:0.875rem;text-align:center;margin-bottom:24px;">Choose the
+                  9-point Monk scale tone to apply to your virtual model.</p>
+                <div class="avatar-tone-grid">
+                  <div class="avatar-tone-option" data-tone="1" style="background:#f6ede4"
+                    onclick="selectAvatarTone(1, '#f6ede4', 'Ivory')"></div>
+                  <div class="avatar-tone-option" data-tone="2" style="background:#f3e7db"
+                    onclick="selectAvatarTone(2, '#f3e7db', 'Porcelain')"></div>
+                  <div class="avatar-tone-option" data-tone="3" style="background:#f7ead0"
+                    onclick="selectAvatarTone(3, '#f7ead0', 'Pale')"></div>
+                  <div class="avatar-tone-option" data-tone="4" style="background:#eadaba"
+                    onclick="selectAvatarTone(4, '#eadaba', 'Light')"></div>
+                  <div class="avatar-tone-option" data-tone="5" style="background:#d7bd96"
+                    onclick="selectAvatarTone(5, '#d7bd96', 'Medium')"></div>
+                  <div class="avatar-tone-option" data-tone="6" style="background:#a07e56"
+                    onclick="selectAvatarTone(6, '#a07e56', 'Tan')"></div>
+                  <div class="avatar-tone-option" data-tone="7" style="background:#825c43"
+                    onclick="selectAvatarTone(7, '#825c43', 'Brown')"></div>
+                  <div class="avatar-tone-option" data-tone="8" style="background:#604134"
+                    onclick="selectAvatarTone(8, '#604134', 'Dark Brown')"></div>
+                  <div class="avatar-tone-option" data-tone="9" style="background:#3a312a"
+                    onclick="selectAvatarTone(9, '#3a312a', 'Ebony')"></div>
+                </div>
+                <div class="avatar-selected-preview" style="text-align:center;margin-top:20px;">
+                  <span id="avatarToneLabel" style="color:var(--gold);font-weight:600;">Tone not selected</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Progress + Buttons -->
+            <div class="progress-wrap" id="progressWrap" style="display:none">
+              <div class="progress-bar" id="progressBar"></div>
+              <p id="progressLabel">Uploading…</p>
+            </div>
+
+            <button class="btn-analyze" id="analyzeBtn" onclick="analyzePhoto()" disabled>
+              <i class="fas fa-magic"></i> Analyze My Style
+            </button>
+            <button class="btn-analyze btn-camera-analyze" id="cameraBtnCapture" onclick="captureAndAnalyze()" disabled
+              style="display:none">
+              <i class="fas fa-camera"></i> Capture &amp; Analyze
+            </button>
+            <button class="btn-analyze" id="avatarBtnGenerate" onclick="generateAvatarStyle()" disabled
+              style="display:none; background: linear-gradient(135deg, #4a9eff, #7a6abf);">
+              <i class="fas fa-tshirt"></i> Enter Virtual Try-On
+            </button>
+          </div>
+
+          <!-- Right — Tips & Tone Chips -->
+          <div class="upload-tips-col">
+            <h3><i class="fas fa-lightbulb"></i> Photo Tips for Best Results</h3>
+            <ul class="tips-list">
+              <li><i class="fas fa-check-circle"></i> Clear, well-lit frontal face photo</li>
+              <li><i class="fas fa-check-circle"></i> Natural daylight gives best colour accuracy</li>
+              <li><i class="fas fa-check-circle"></i> Face clearly visible, straight on</li>
+              <li><i class="fas fa-check-circle"></i> Photo should match your chosen gender</li>
+              <li><i class="fas fa-times-circle"></i> No sunglasses, masks or heavy filters</li>
+              <li><i class="fas fa-times-circle"></i> Avoid extreme dark or overexposed lighting</li>
+            </ul>
+
+            <div class="skin-tones-info">
+              <p class="selector-label">9-Point Monk Skin Tone Scale:</p>
+              <div class="tone-preview-grid">
+                <div class="tone-chip" style="background:#f6ede4" title="MST-1: Ivory"><span>1</span></div>
+                <div class="tone-chip" style="background:#f3d7c1" title="MST-2: Fair"><span>2</span></div>
+                <div class="tone-chip" style="background:#dbb799" title="MST-3: Light Beige"><span>3</span></div>
+                <div class="tone-chip" style="background:#c8943a" title="MST-4: Sandy Beige"><span>4</span></div>
+                <div class="tone-chip" style="background:#a97842" title="MST-5: Golden Beige"><span>5</span></div>
+                <div class="tone-chip" style="background:#8d5524" title="MST-6: Warm Tan"><span>6</span></div>
+                <div class="tone-chip" style="background:#6e3e14" title="MST-7: Olive Brown"><span>7</span></div>
+                <div class="tone-chip" style="background:#4a2010" title="MST-8: Caramel"><span>8</span></div>
+                <div class="tone-chip" style="background:#1e0d07" title="MST-9: Ebony"><span>9</span></div>
+              </div>
+              <p style="font-size:0.75rem;color:var(--text-muted);margin-top:8px">
+                Based on Google's <strong style="color:var(--gold)">Monk Skin Tone Scale</strong> — 9 tones covering
+                every human complexion.
+              </p>
+            </div>
+
+            <div class="live-camera-tip">
+              <i class="fas fa-video"></i>
+              <div>
+                <strong>Try Live Camera!</strong>
+                <p>Switch to Live Camera to see your skin tone update in real-time as you face the webcam.</p>
+              </div>
+            </div>
+
+            <!-- AI Stack info -->
+            <div class="ai-stack-card">
+              <p class="selector-label"><i class="fas fa-microchip"></i> AI Models Running:</p>
+              <ul class="ai-stack-list">
+                <li><i class="fas fa-circle-check"></i> YOLO — Face Detection</li>
+                <li><i class="fas fa-circle-check"></i> DINOv2-Giant — Skin Analysis</li>
+                <li><i class="fas fa-circle-check"></i> DeepFace — Gender Validation</li>
+                <li><i class="fas fa-circle-check"></i> HuggingFace LLaMA 3.3 70B — Style Advice</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ══════════════════════════════════════
+     PAGE 3: RESULTS
+══════════════════════════════════════ -->
+  <div class="page" id="page-results">
+    <section class="results-section">
+      <div class="container">
+        <div class="results-header">
+          <div>
+            <div class="section-label">Your Style Profile</div>
+            <h2 class="section-title">Personalized Recommendations</h2>
+          </div>
+          <div class="results-actions">
+            <div class="gender-used-badge" id="genderUsedBadge"></div>
+            <button class="btn-reset" onclick="resetAndAnalyze()">
+              <i class="fas fa-redo"></i> Try Again
+            </button>
+          </div>
+        </div>
+
+        <!-- Skin Tone -->
+        <div class="tone-result-card">
+          <div class="tone-swatch" id="toneSwatch"></div>
+          <div class="tone-info">
+            <h3 id="toneName">—</h3>
+            <p id="toneRgb">RGB: —</p>
+            <p id="toneHex">HEX: —</p>
+          </div>
+          <div class="tone-badge">Skin Tone Detected ✓</div>
+        </div>
+
+        <!-- Avatar Virtual Try-On (Only shown if is_avatar = true) -->
+        <div id="avatarTryOnSection" class="avatar-tryon-section" style="display:none">
+          <div class="section-label" style="text-align:center;"><i class="fas fa-magic"></i> Virtual Try-On</div>
+          <h2 class="section-title" style="text-align:center;">Your Interactive Avatar</h2>
+          <p class="shopping-hint" style="text-align:center;">Hover &amp; click on the generated clothing items to shop
+            them directly.</p>
+
+          <div class="avatar-stage">
+            <!-- Dynamic Base Body Silhouette -->
+            <svg id="avatarBaseSvg" class="avatar-base-body" viewBox="0 0 400 800" xmlns="http://www.w3.org/2000/svg">
+              <!-- Generic sleek mannequin silhouette -->
+              <path id="avatarBodyPath"
+                d="M200 50 C220 50, 235 65, 235 85 C235 105, 220 120, 200 120 C180 120, 165 105, 165 85 C165 65, 180 50, 200 50 Z M150 140 C170 130, 230 130, 250 140 C280 160, 290 190, 290 260 L280 400 L250 400 L240 280 L230 450 L230 750 L190 750 L180 500 L170 750 L130 750 L130 450 L120 280 L110 400 L80 400 L70 260 C70 190, 80 160, 150 140 Z"
+                fill="#d7bd96" />
+            </svg>
+
+            <!-- Clothing Layers (images absolute positioned over body) -->
+            <div id="avatarLayerPants" class="avatar-layer avatar-pants" onclick="scrollToProduct(1)"
+              title="Shop Trousers">
+              <img src="" alt="Trousers" />
+            </div>
+            <div id="avatarLayerShirt" class="avatar-layer avatar-shirt" onclick="scrollToProduct(0)"
+              title="Shop Shirt">
+              <img src="" alt="Shirt" />
+            </div>
+            <div id="avatarLayerShoes" class="avatar-layer avatar-shoes" onclick="scrollToProduct(2)"
+              title="Shop Shoes">
+              <img src="" alt="Shoes" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Outfit Preview (proxied fashion image — skin-tone & gender specific) -->
+        <div id="outfitPreviewSection" class="outfit-preview-section" style="display:none">
+          <div class="outfit-preview-label">
+            <i class="fas fa-eye"></i> Full Outfit Preview
+            <span class="outfit-preview-hint">AI-matched to your skin tone &amp; gender</span>
+          </div>
+          <div class="outfit-preview-wrap">
+            <img id="outfitPreviewImg" src="" alt="Outfit Preview" loading="lazy" />
+            <div class="outfit-preview-overlay">
+              <p>Scroll down for detailed breakdown &amp; shop links ↓</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recommendations Grid -->
+        <div class="recs-grid" id="recsGrid"></div>
+
+        <!-- Shopping Section -->
+        <div class="shopping-section">
+          <div class="section-label">Shop Your Style</div>
+          <h2 class="section-title">Outfit Previews &amp; Shopping</h2>
+          <p class="shopping-hint">
+            Click <strong>👁 Preview Look</strong> to see outfit images right here —
+            then shop directly from your preferred store.
+          </p>
+          <div class="products-grid" id="productsGrid"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ══════════════════════════════════════
+     PAGE 4: ABOUT
+══════════════════════════════════════ -->
+  <div class="page" id="page-about">
+    <section class="how-section">
+      <div class="container">
+        <div class="section-label">Process</div>
+        <h2 class="section-title">How Style AI Works</h2>
+
+        <div class="steps-row">
+          <div class="step-card">
+            <div class="step-num">01</div>
+            <div class="step-icon"><i class="fas fa-video"></i></div>
+            <h3>Upload or Capture</h3>
+            <p>Upload a clear face photo or use your live camera with real-time skin tone detection</p>
+          </div>
+          <div class="step-arrow">→</div>
+          <div class="step-card">
+            <div class="step-num">02</div>
+            <div class="step-icon"><i class="fas fa-venus-mars"></i></div>
+            <h3>Gender Validation</h3>
+            <p>DeepFace AI verifies that your photo matches your selected gender — stops mismatches before analysis</p>
+          </div>
+          <div class="step-arrow">→</div>
+          <div class="step-card">
+            <div class="step-num">03</div>
+            <div class="step-icon"><i class="fas fa-brain"></i></div>
+            <h3>Skin Tone Analysis</h3>
+            <p>YOLO detects your face, DINOv2-Giant extracts features, and OpenCV classifies your exact skin tone</p>
+          </div>
+          <div class="step-arrow">→</div>
+          <div class="step-card">
+            <div class="step-num">04</div>
+            <div class="step-icon"><i class="fas fa-tshirt"></i></div>
+            <h3>AI Styling</h3>
+            <p>Groq's LLaMA 3.3 70B generates gender-specific, skin-tone-matched outfit recommendations</p>
+          </div>
+          <div class="step-arrow">→</div>
+          <div class="step-card">
+            <div class="step-num">05</div>
+            <div class="step-icon"><i class="fas fa-shopping-bag"></i></div>
+            <h3>Preview &amp; Shop</h3>
+            <p>See outfit previews on-site and shop directly from 7+ premium Indian &amp; global fashion stores</p>
+          </div>
+        </div>
+
+        <!-- Tech stack -->
+        <div class="tech-stack-grid">
+          <div class="tech-card">
+            <div class="tech-icon"><i class="fas fa-eye"></i></div>
+            <h4>YOLO v8</h4>
+            <p>Face detection on GPU</p>
+          </div>
+          <div class="tech-card">
+            <div class="tech-icon"><i class="fas fa-microchip"></i></div>
+            <h4>DINOv2-Giant</h4>
+            <p>1B+ param vision model</p>
+          </div>
+          <div class="tech-card">
+            <div class="tech-icon"><i class="fas fa-venus-mars"></i></div>
+            <h4>DeepFace</h4>
+            <p>Gender classification</p>
+          </div>
+          <div class="tech-card">
+            <div class="tech-icon"><i class="fas fa-bolt"></i></div>
+            <h4>Groq LLaMA 3.3</h4>
+            <p>70B param style AI</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <div class="footer-brand"><span class="brand-icon">✦</span> Style<em>AI</em></div>
+        <p>© 2024 StyleAI · Powered by Groq LLaMA 3.3 70B · YOLO · DINOv2 · DeepFace</p>
+        <div class="footer-stores">
+          <span>Amazon.in</span><span>Myntra</span><span>Zara</span>
+          <span>Flipkart</span><span>Puma</span><span>Adidas</span><span>Armani Exchange</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ══ OUTFIT PREVIEW MODAL ══ -->
+  <div class="modal-overlay" id="previewModal" onclick="closeModal(event)">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closePreviewModal()"><i class="fas fa-times"></i></button>
+      <div class="modal-img-wrap">
+        <img id="modalImg" src="" alt="Outfit Preview" />
+        <div class="modal-img-gradient"></div>
+      </div>
+      <div class="modal-body">
+        <h3 id="modalTitle"></h3>
+        <p id="modalDesc"></p>
+        <div id="modalStores" class="modal-stores"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- Interactive & Base Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.8.0/dist/vanilla-tilt.min.js"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/tsparticles-preset-stars@2.12.0/tsparticles.preset.stars.bundle.min.js"></script>
+
+  <!-- GSAP + ScrollTrigger for premium animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <!-- App Logic -->
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>
