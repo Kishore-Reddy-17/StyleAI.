@@ -1,0 +1,410 @@
+/* ================================================
+   STYLE AI — CSS Animations
+   Premium transitions, floating, glow, shimmer
+   ================================================ */
+
+/* ── Floating particles bg (canvas-free, CSS-only) ── */
+@keyframes floatUp {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0.6;
+    }
+
+    50% {
+        transform: translateY(-30px) rotate(180deg);
+        opacity: 0.3;
+    }
+
+    100% {
+        transform: translateY(0) rotate(360deg);
+        opacity: 0.6;
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -400px 0;
+    }
+
+    100% {
+        background-position: 400px 0;
+    }
+}
+
+@keyframes pulseGlow {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(201, 169, 110, 0);
+    }
+
+    50% {
+        box-shadow: 0 0 24px 6px rgba(201, 169, 110, 0.25);
+    }
+}
+
+@keyframes fadeSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(28px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeSlideLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-24px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeSlideRight {
+    from {
+        opacity: 0;
+        transform: translateX(24px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.88);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes borderGlow {
+
+    0%,
+    100% {
+        border-color: rgba(201, 169, 110, 0.18);
+    }
+
+    50% {
+        border-color: rgba(201, 169, 110, 0.55);
+    }
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+@keyframes rotateGradient {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes countUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ── GSAP-ready initial hidden states ── */
+.gsap-fade {
+    opacity: 0;
+}
+
+.gsap-up {
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+.gsap-left {
+    opacity: 0;
+    transform: translateX(-30px);
+}
+
+.gsap-right {
+    opacity: 0;
+    transform: translateX(30px);
+}
+
+.gsap-scale {
+    opacity: 0;
+    transform: scale(0.9);
+}
+
+/* ── Hero ── */
+.hero-badge {
+    animation: fadeSlideUp .6s ease .1s both;
+}
+
+.hero-title {
+    animation: fadeSlideUp .7s ease .2s both;
+}
+
+.hero-subtitle {
+    animation: fadeSlideUp .7s ease .35s both;
+}
+
+.hero-cta {
+    animation: fadeSlideUp .7s ease .5s both;
+}
+
+.hero-stats {
+    animation: fadeSlideUp .7s ease .65s both;
+}
+
+.hero-visual {
+    animation: fadeSlideRight .8s ease .3s both;
+}
+
+/* ── Floating hero cards ── */
+.hc-1 {
+    animation: float 4.0s ease-in-out infinite;
+}
+
+.hc-2 {
+    animation: float 4.5s ease-in-out .5s infinite;
+}
+
+.hc-3 {
+    animation: float 4.2s ease-in-out 1s infinite;
+}
+
+.hc-4 {
+    animation: float 4.8s ease-in-out .8s infinite;
+}
+
+/* ── Navbar ── */
+.navbar {
+    animation: fadeSlideUp .5s ease both;
+}
+
+/* ── Pulse-glow on primary button ── */
+.btn-primary {
+    animation: pulseGlow 3s ease-in-out infinite;
+}
+
+.btn-primary:hover {
+    animation: none;
+}
+
+/* ── Shimmer skeleton (loading state) ── */
+.shimmer {
+    background: linear-gradient(90deg,
+            var(--surface2) 25%, rgba(201, 169, 110, 0.08) 50%, var(--surface2) 75%);
+    background-size: 800px 100%;
+    animation: shimmer 1.6s infinite;
+}
+
+/* ── Progress bar gradient flow ── */
+#progressBar {
+    background: linear-gradient(90deg, #c9a96e, #f0e8d5, #c9a96e);
+    background-size: 200% 100%;
+    animation: rotateGradient 1.5s ease infinite;
+}
+
+/* ── Feature card hover lift ── */
+.feature-card {
+    transition: transform .3s cubic-bezier(.34, 1.56, .64, 1), box-shadow .3s ease, border-color .3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 16px 40px rgba(201, 169, 110, 0.12);
+}
+
+.feature-icon {
+    transition: transform .3s ease;
+}
+
+.feature-card:hover .feature-icon {
+    transform: scale(1.18) rotate(-8deg);
+}
+
+/* ── Step card ── */
+.step-card {
+    transition: transform .3s cubic-bezier(.34, 1.56, .64, 1), border-color .3s ease;
+}
+
+.step-card:hover {
+    transform: translateY(-8px) scale(1.03);
+    border-color: var(--gold);
+}
+
+.step-icon {
+    transition: transform .35s ease;
+}
+
+.step-card:hover .step-icon {
+    transform: scale(1.25) rotate(10deg);
+}
+
+/* ── Tone swatch animated ring ── */
+.tone-swatch {
+    position: relative;
+    animation: pulseGlow 2.5s ease-in-out infinite;
+    transition: transform .3s ease;
+}
+
+.tone-swatch:hover {
+    transform: scale(1.1);
+}
+
+/* ── Product card ── */
+.product-card {
+    transition: transform .3s cubic-bezier(.34, 1.56, .64, 1), border-color .3s ease, box-shadow .3s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Hero pipeline step ── */
+.hp-step {
+    transition: transform .25s ease;
+}
+
+.hp-step:hover {
+    transform: scale(1.15);
+}
+
+.hp-step i {
+    transition: color .25s ease;
+}
+
+.hp-step:hover i {
+    color: var(--gold-light);
+}
+
+/* ── Nav links ripple-underline ── */
+.nav-links a {
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    right: 50%;
+    height: 2px;
+    background: var(--gold);
+    border-radius: 2px;
+    transition: left .25s ease, right .25s ease;
+}
+
+.nav-links a:hover::after,
+.nav-links a.active::after {
+    left: 8px;
+    right: 8px;
+}
+
+/* ── Gender mismatch banner pulse ── */
+.gender-mismatch-banner {
+    animation: fadeSlideUp .4s ease, borderGlow 3s ease-in-out 1s infinite;
+}
+
+/* ── Rec card stagger (GSAP will handle, but CSS fallback) ── */
+.rec-card {
+    transition: border-color .25s ease, transform .25s ease;
+}
+
+.rec-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(201, 169, 110, 0.5);
+}
+
+/* ── Status dot extra glow ── */
+.status-dot {
+    animation: pulseGlow 2s ease-in-out infinite, pulse 2s infinite;
+}
+
+/* ── Skin tone chips hover ── */
+.tone-chip {
+    transition: transform .25s ease, box-shadow .25s ease;
+    cursor: default;
+}
+
+.tone-chip:hover {
+    transform: scaleY(1.1) translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Drop zone dotted border animate ── */
+.drop-zone {
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 6px, rgba(201, 169, 110, 0.08) 6px, rgba(201, 169, 110, 0.08) 7px);
+    animation: borderGlow 4s ease-in-out infinite;
+}
+
+.drop-zone.drag-over {
+    animation: pulseGlow 0.8s ease-in-out infinite !important;
+    background: rgba(201, 169, 110, 0.08) !important;
+}
+
+/* ── Page transition ── */
+.page.active {
+    animation: fadeSlideUp .45s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+/* ── Store link hover ── */
+.store-link {
+    position: relative;
+    overflow: hidden;
+}
+
+.store-link::before {
+    content: '';
+    position: absolute;
+    left: -100%;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    background: rgba(201, 169, 110, 0.08);
+    transition: left .25s ease;
+}
+
+.store-link:hover::before {
+    left: 0;
+}
+
+/* ── Hero pipeline arrow pulse ── */
+.hp-arrow {
+    animation: float 2s ease-in-out infinite;
+    opacity: 0.6;
+}
